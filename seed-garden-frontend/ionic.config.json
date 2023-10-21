@@ -1,0 +1,7 @@
+{
+  "name": "seed-garden-frontend",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
