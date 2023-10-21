@@ -14,7 +14,11 @@
     "@capacitor/android": "5.5.0",
     "@capacitor/core": "^5.5.0",
     "@capacitor/ios": "^5.5.0",
-    "vue": "^3.3.4"
+    "bootstrap-icons": "^1.11.1",
+    "firebase": "^10.5.0",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.5",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@capacitor/cli": "^5.5.0",
