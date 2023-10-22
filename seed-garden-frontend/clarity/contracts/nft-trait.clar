@@ -1,12 +1,3 @@
-
-;; title: nft-trait
-;; version:
-;; summary:
-;; description:
-
-;; traits
-;;
-
 (define-trait nft-trait
   (
     ;; Last token ID, limited to uint range
@@ -22,25 +13,3 @@
     (transfer (uint principal principal) (response bool uint))
   )
 )
-
-;; token definitions
-;; 
-
-;; constants
-;;
-
-;; data vars
-;;
-
-;; data maps
-;;
-
-;; public functions
-;;
-
-;; read only functions
-;;
-
-;; private functions
-;;
-

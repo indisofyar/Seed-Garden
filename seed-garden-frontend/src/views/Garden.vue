@@ -1,19 +1,113 @@
 <script>
 
+import {
+    AppConfig,
+    UserSession,
+    showConnect,
+    openContractCall,
+} from "@stacks/connect";
+
+import { StacksMocknet } from "@stacks/network";
+
+
+import {
+    stringUtf8CV,
+    AnchorMode,
+    standardPrincipalCV,
+    callReadOnlyFunction,
+    makeStandardSTXPostCondition,
+    FungibleConditionCode
+} from "@stacks/transactions";
+
+
+const network = new StacksMocknet();
+const appConfig = new AppConfig(["store_write"]);
+const userSession = new UserSession({ appConfig });
+const appDetails = {
+    name: "Hello Stacks",
+    icon: "https://freesvg.org/img/1541103084.png",
+};
+
+
 export default {
     name: 'Garden',
+    methods: {
+        deployNft() {
+            
+            const network = new StacksMocknet();
+
+            const options = {
+                contractAddress: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+                contractName: "seedgarden-nft",
+                functionName: "mint-nft",
+                functionArgs: [stringUtf8CV(this.message)],
+                network,
+                appDetails: {
+                    name: "Hello Stacks",
+                    icon: "https://freesvg.org/img/1541103084.png",
+                },
+                onFinish: ({ txId }) => console.log(txId),
+            };
+
+            openContractCall(options);
+        },
+        connectWallet() {
+            const appConfig = new AppConfig(["store_write"]);
+            const userSession = new UserSession({ appConfig });
+            const appDetails = {
+                name: "Hello Stacks",
+                icon: "https://freesvg.org/img/1541103084.png",
+            };
+
+            showConnect({
+                appDetails,
+                onFinish: () => this.finishedConnecting(userSession),
+                userSession,
+            });
+        },
+        finishedConnecting(userSession) {
+
+
+            const vm = this;
+            if (userSession.isSignInPending()) {
+                userSession.handlePendingSignIn().then((userData) => {
+                    vm.userData = userData;
+                });
+            } else if (userSession.isUserSignedIn()) {
+                vm.userData = userSession.loadUserData();
+            }
+        },
+    },
+    computed: {
+        userSession() {
+            return userSession
+        }
+    },
     data() {
         return {
             showSign: false,
             dotsAmount: 2,
             selectedDot: 1,
             showHistory: false,
+            userData: null,
+        }
+    },
+    watch: {
+        userSession(val) {
+            if (val.isSignInPending()) {
+                val.handlePendingSignIn().then((userData) => {
+                    vm.userData = userData;
+                });
+            } else if (userSession.isUserSignedIn()) {
+                userData = userSession.loadUserData()
+            }
         }
     },
     mounted() {
         this.showSign = true
     }
 }
+
 
 </script>
 
@@ -29,7 +123,7 @@ export default {
             <Transition name="sign">
                 <div class="float-in relative">
                     <img src="/sign.svg" class="">
-                    <div class="absolute bottom-[50px] left-[90px] text-[#4D3423] font-serif italic text-3xl uppercase">
+                    <div class="absolute bottom-[50px] left-[80px] text-[#4D3423] font-serif italic text-3xl uppercase">
                         <span v-if="$store.state.userName != ''" class="text-[#4D3423]">{{ $store.state.userName
                         }}</span><span class="text-[#4D3423]" v-else>Jake</span>'s Garden
                     </div>
@@ -62,40 +156,68 @@ export default {
             <div class=" bg-[#9fb09f] mt-4 max-h-[200px] w-full p-3 flex justify-center rounded-lg shadow-xl">
                 <img src="/wheat-6.svg" class="max-w-full max-h-full">
             </div>
-            <button class="w-full mt-4 btn btn-neutral  text-black transition-all transition-duration-1s" @click="showHistory = !showHistory">History <i
-                    class="bi text-black bi-chevron-right" :class="{'rotate-90' : showHistory}"></i></button>
-            
-                <div v-if="showHistory">
-                    <div
-                        class=" relative bg-[#779277] mt-4 max-h-[150px] w-full p-3 flex justify-center text-lg rounded-lg shadow-xl overflow-y-scroll">
-                        Wheat is a grass widely cultivated for its seed, a cereal grain that is a worldwide staple food. The
-                        many
-                        species of wheat together make up the genus Triticum /ˈtrɪtɪkəm/;[3] the most widely grown is common
-                        wheat
-                        (T. aestivum). The archaeological record suggests that wheat was first cultivated in the regions of
-                        the
-                        Fertile Crescent around 9600 BC. Botanically, the wheat kernel is a caryopsis, a type of fruit.
-                    </div>
-                    <div
-                        class="text-left relative bg-[#9dba9d] mt-4 max-h-[150px] w-full p-3 text-lg rounded-lg shadow-xl overflow-y-scroll">
-                        <strong>Did you know?</strong><br>
+            <button class="w-full mt-4 btn btn-neutral  text-black transition-all transition-duration-1s"
+                @click="showHistory = !showHistory">History <i class="bi text-black bi-chevron-right"
+                    :class="{ 'rotate-90': showHistory }"></i></button>
 
-                        Wheat cultivation is even older than the first cities in the world, the Great Pyramid of Giza and
-                        the
-                        first
-                        solar calendar ever created.
-                    </div>
+            <div v-if="showHistory">
+                <div
+                    class=" relative bg-[#779277] mt-4 max-h-[150px] w-full p-3 flex justify-center text-lg rounded-lg shadow-xl overflow-y-scroll">
+                    Wheat is a grass widely cultivated for its seed, a cereal grain that is a worldwide staple food. The
+                    many
+                    species of wheat together make up the genus Triticum /ˈtrɪtɪkəm/;[3] the most widely grown is common
+                    wheat
+                    (T. aestivum). The archaeological record suggests that wheat was first cultivated in the regions of
+                    the
+                    Fertile Crescent around 9600 BC. Botanically, the wheat kernel is a caryopsis, a type of fruit.
                 </div>
-                <div>
-                    <button class="w-full mt-4 btn btn-neutral  text-black transition-all transition-duration-1s opacity" >
-                        <div>Mint NFT </div>
-                        <div class="badge badge-accent">Only 4 left</div></button>
+                <div
+                    class="text-left relative bg-[#9dba9d] mt-4 max-h-[150px] w-full p-3 text-lg rounded-lg shadow-xl overflow-y-scroll">
+                    <strong>Did you know?</strong><br>
+
+                    Wheat cultivation is even older than the first cities in the world, the Great Pyramid of Giza and
+                    the
+                    first
+                    solar calendar ever created.
                 </div>
-            
+            </div>
+            <div>
+                <button class="w-full mt-4 btn btn-neutral  text-black transition-all transition-duration-1s opacity"
+                    @click="selectedDot++">
+                    <div>Mint NFT </div>
+                    <div class="badge badge-accent">Only 4 left</div>
+                </button>
+            </div>
+
 
             <button class="w-full mt-20 btn btn-primary text-white" @click="selectedDot = 2">Back</button>
         </div>
+        <div v-if="selectedDot == 4" class="p-4">
+            <div class="font-serif text-3xl italic  font-normal">Mint your NFT</div>
+            <button className=" mt-4 p-4 btn btn-primary w-full first-line:rounded text-white" @click="connectWallet"
+                v-if="!userData">
+                Connect Wallet
+            </button>
+
+            <button className="p-4 mt-4  mb-4 btn btn-primary w-full first-line:rounded text-white" @click="selectedDot++"
+                v-if="userData">
+                Confirm (0.68 STX)
+            </button>
+       
+            <div class="card w-96 bg-base-100 shadow-xl max-w-full" v-if="userData">
+                <div class="card-body overflow-scroll">
+                    <strong class="font-bold">STX Address</strong>
+                    {{ userSession.loadUserData().profile.stxAddress.testnet }}
+                </div>
+            </div>
+
+
+
+        </div>
     </TransitionGroup>
+    <Transition name="slideright">
+        <img src="/real-nfts-in-your-area.png" class="absolute top-0" v-if="selectedDot == 5">
+    </Transition>
 </template>
 
 <style>
@@ -123,6 +245,7 @@ export default {
 .slideright-leave-to {
     transform: translateX(-100%);
 }
+
 .opacity-enter-active,
 .opacity-leave-active {
     transition: opacity 0.8s ease-in-out;
@@ -152,4 +275,5 @@ export default {
         transform: translateY(0);
     }
 
-}</style>
+}
+</style>

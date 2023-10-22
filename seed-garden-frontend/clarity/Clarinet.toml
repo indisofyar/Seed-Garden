@@ -12,17 +12,22 @@ path = 'contracts/hello-world.clar'
 clarity_version = 2
 epoch = 2.4
 
-[contracts.my-nft]
-path = 'contracts/my-nft.clar'
-clarity_version = 2
-epoch = 2.4
-
+[[project.requirements]]
+contract_id = 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait'
 [contracts.nft-trait]
 path = 'contracts/nft-trait.clar'
 clarity_version = 2
 epoch = 2.4
-[repl.analysis]
-passes = ['check_checker']
+
+[[project.requirements]]
+contract_id = 'SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.nft-trait'
+[contracts.seedgarden-nft]
+path = 'contracts/seedgarden-nft.clar'
+depends_on=["nft_trait"]
+clarity_version = 2
+epoch = 2.4
+
+
 
 [repl.analysis.check_checker]
 strict = false
