@@ -5,5 +5,5 @@
 # Short summary (150 words)
 Seed garden is a mobile game which helps people destress. It includes a collection of NFTs.
 
-# Profit model
-Seed garden
+# Demo
+[Seed garden](https://seedgarden4761.web.app/#/)https://seedgarden4761.web.app/#/
