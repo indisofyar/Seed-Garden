@@ -13,10 +13,15 @@ const routes = [
     name: 'garden',
     component: Garden
   },
+  {
+    path: '/puzzle',
+    name: 'puzzle',
+    component: Puzzle
+  },
 ]
 
 const router = createRouter({
-  
+
   history: createWebHashHistory(),
   routes,
   scrollBehavior() {
